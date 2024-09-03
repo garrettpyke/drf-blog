@@ -3,6 +3,9 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
 class MyUserManager(BaseUserManager):
+    """
+    A custom user manager for MyUser model. Notice there are no properties, only methods.
+    """
     def create_user(self, email, password=None):
         """
         Creates and saves a User with the given email and password.
