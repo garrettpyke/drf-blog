@@ -2,9 +2,10 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated # todo: don't need here for Token auth, but will need elsewhere
 
 from ..serializers.user import UserSerializer
-from ..models import MyUser #todo: do I really need this?
+# from ..models import MyUser #todo: do I really need this?
 
 class SignUp(generics.CreateAPIView):
     # Override the authentication/permissions classes so this endpoint
@@ -50,3 +51,28 @@ class SignIn(generics.CreateAPIView):
             })
         else:
             return Response({ 'msg': 'The username and/or password is incorrect.' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        
+class SignOut(generics.DestroyAPIView):
+    def delete(self, request):
+        user = request.user
+        # Remove this token from the user
+        Token.objects.filter(user=user).delete()
+        user.token = None
+        user.save()
+        # Logout will remove all session data
+        logout(request)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class ChangePassword(generics.UpdateAPIView):
+    def patch(self, request):
+        user = request.user
+        old_pw = request.data['passwords']['old']
+        new_pw = request.data['passwords']['new']
+        # check_password is included with the Django base user model
+        if not user.check_password(old_pw):
+            return Response({ 'msg': 'Wrong password' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        # set_password will also hash the password
+        user.set_password(new_pw)
+        user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
