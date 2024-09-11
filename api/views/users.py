@@ -5,7 +5,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated # todo: don't need here for Token auth, but will need elsewhere
 
 from ..serializers.user import UserSerializer
-# from ..models import MyUser #todo: do I really need this?
 
 class SignUp(generics.CreateAPIView):
     # Override the authentication/permissions classes so this endpoint
