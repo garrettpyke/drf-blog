@@ -133,3 +133,48 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'api.MyUser' 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+    },
+    'handlers': {
+        'default': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': 'logs/mylog.log',
+            'maxBytes': 1024*1024*5, # 5 MB
+            'backupCount': 5,
+            'formatter':'standard',
+        },  
+        'request_handler': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': 'logs/django_request.log',
+            'maxBytes': 1024*1024*5, # 5 MB
+            'backupCount': 5,
+            'formatter':'standard',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level':'DEBUG',
+        },
+    },
+    'loggers': {
+        # Note that this logger is unnamed, therefore it's a global logger. See Django documentation on logging namepaces.
+        '': {
+            'handlers': ['default', 'console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+        # 'django.request': {
+        #     'handlers': ['request_handler'],
+        #     'level': 'DEBUG',
+        #     'propagate': False
+        # },
+    }
+}
