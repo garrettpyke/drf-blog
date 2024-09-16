@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import logging.config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,6 +142,15 @@ LOGGING = {
         'standard': {
             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
         },
+        'basic': {
+            'format': '%(asctime)s %(clientip)-15s %(user)-8s %(message)s'
+            },
+        'fmt1': {
+            'format': '[FMT1] %(asctime)-15s %(message)s'
+        },
+        'fmt2': {
+            'format': '[FMT2] %(asctime)-15s %(message)s'
+        },
     },
     'handlers': {
         'default': {
@@ -160,21 +170,22 @@ LOGGING = {
             'formatter':'standard',
         },
         'console': {
-            'class': 'logging.StreamHandler',
             'level':'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter':'fmt1',
         },
     },
     'loggers': {
         # Note that this logger is unnamed, therefore it's a global logger. See Django documentation on logging namepaces.
         '': {
-            'handlers': ['default', 'console'],
+            'handlers': ['default', 'console', 'request_handler'],
             'level': 'DEBUG',
             'propagate': True
         },
-        # 'django.request': {
-        #     'handlers': ['request_handler'],
-        #     'level': 'DEBUG',
-        #     'propagate': False
-        # },
+        'django.request': {
+            'handlers': ['request_handler'],
+            'level': 'DEBUG',
+            'propagate': False
+        },
     }
 }

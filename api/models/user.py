@@ -45,6 +45,7 @@ class MyUser(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
 
     # `objects = MyUserManager()` is defining a custom manager for the `MyUser` model.
+    # It associates the MyUserManager class with the MyUser model.
     objects = MyUserManager()
 
     USERNAME_FIELD = "email"
