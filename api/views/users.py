@@ -4,22 +4,7 @@ from rest_framework import status, generics
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated # todo: don't need here for Token auth, but will need elsewhere
 import logging
-
 from ..serializers.user import UserSerializer
-
-
-# def get_my_logger():
-#     logger = logging.getLogger(__name__)
-#     logger.setLevel(logging.DEBUG)
-#     print('Getting my logger')
-#     print('logger name: ', __name__)
-    
-#     return logger
-
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
-# print('Getting my logger')
-# print('logger name: ', __name__)
 
 class SignUp(generics.CreateAPIView):
     # Override the authentication/permissions classes so this endpoint
@@ -49,12 +34,10 @@ class SignIn(generics.CreateAPIView):
         # use django authenticate to verify password and email match
         user = authenticate(request, email=email, password=password)
         
-        # print(logger.getEffectiveLevel()) #* Works
-        # logger.info("Attempting to sign in") # No result
-        # logger.log(1, 'Attempting to sign in') # No result
+        # print(logger.getEffectiveLevel())
         logger = logging.getLogger(__name__)
-        print('Name: ', __name__)
-        logger.debug('Debug log message') #* Works
+        print('Name: ', __name__) #* This shows the name of the logger, which can be used in logging settings - in this case it's 'api.views.users'
+        logger.debug('Debug log message!') #* Works
         
         # Is our user is successfully authenticated...
         if user is not None:  

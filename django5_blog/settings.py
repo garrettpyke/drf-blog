@@ -137,19 +137,23 @@ AUTH_USER_MODEL = 'api.MyUser'
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'standard': {
             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
         },
         'basic': {
-            'format': '%(asctime)s %(clientip)-15s %(user)-8s %(message)s'
+            'format': '%(asctime)s %(message)s'
             },
         'fmt1': {
             'format': '[FMT1] %(asctime)-15s %(message)s'
         },
         'fmt2': {
             'format': '[FMT2] %(asctime)-15s %(message)s'
+        },
+        'verbose': {
+            'format': '{levelno}: {levelname} {asctime} {relativeCreated} {module}:{funcName} {processName} {taskName} {threadName} {message}',
+            'style': '{',
         },
     },
     'handlers': {
@@ -159,8 +163,13 @@ LOGGING = {
             'filename': 'logs/mylog.log',
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
-            'formatter':'standard',
+            'formatter':'verbose',
         },  
+        'http': {
+            'level':'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter':'standard',
+        },
         'request_handler': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
@@ -172,20 +181,25 @@ LOGGING = {
         'console': {
             'level':'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter':'fmt1',
+            'formatter':'verbose',
         },
     },
     'loggers': {
-        # Note that this logger is unnamed, therefore it's a global logger. See Django documentation on logging namepaces.
-        '': {
-            'handlers': ['default', 'console', 'request_handler'],
+        # Note that if a logger is unnamed (empty string), it's a global logger. See Django documentation on logging namepaces.
+        'api.views.users': {
+            'handlers': ['default', 'console', 'http'],
             'level': 'DEBUG',
             'propagate': True
         },
-        'django.request': {
-            'handlers': ['request_handler'],
-            'level': 'DEBUG',
-            'propagate': False
+        # 'django.request': {
+        #     'handlers': ['request_handler', 'console'],
+        #     'level': 'DEBUG',
+        #     'propagate': True
+        # },
+        'django': {
+            'handlers': ['http'],
+            'level': 'INFO',
+            'propagate': True,
         },
     }
 }
