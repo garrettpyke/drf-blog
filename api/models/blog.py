@@ -15,4 +15,5 @@ class Blog(models.Model):
     updated_at = models.DateTimeField(auto_now = True)
     
     def __str__(self):
-        return self.title
+        # return self.title
+        return f"{__class__}(title='{self.title}', author='{self.author}', updated={self.updated_at}"
