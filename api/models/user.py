@@ -63,6 +63,8 @@ class MyUser(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+    
+    # todo: make __str__() method that only prints up to the '@'
 
     @property
     def is_staff(self):
