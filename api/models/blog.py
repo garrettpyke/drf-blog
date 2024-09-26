@@ -16,4 +16,4 @@ class Blog(models.Model):
     
     def __str__(self):
         # return self.title
-        return f"{__class__}(title='{self.title}', author='{self.author}', updated={self.updated_at}"
+        return f"{__class__}(title='{self.title}', author='{self.author}', updated='{self.updated_at}'"

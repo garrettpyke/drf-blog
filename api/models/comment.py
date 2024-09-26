@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from ..models.blog import Blog
 
 """
 content : string
@@ -15,4 +16,5 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)    
     
     def __str__(self):
-        return f"{__class__}(content='{self.content[:50]}', author='{self.author}', updated={self.updated_at}"
+        return f"{__class__}"
+        # return f"{__class__}(content='{self.content[:50]}', author='{self.author}', updated='{self.updated_at}'"
