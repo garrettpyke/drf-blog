@@ -8,7 +8,7 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
 
-# todo: return additional data from views to make fully RESTful
+# todo: return related urls & data from views to make fully RESTful
 
 class BlogsView(APIView):
     def get(self, request):
@@ -26,3 +26,34 @@ class BlogsView(APIView):
             return Response(blog.data, status=status.HTTP_201_CREATED)
         else:
             return Response(blog.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class BlogView(APIView):
+    def get(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        if request.user != blog.author:
+            raise PermissionDenied('Unauthorized, you do not own this blog')
+        else:  
+            data = BlogSerializer(blog).data
+            return Response(data)
+
+    def delete(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        if request.user != blog.author:
+            raise PermissionDenied('Unauthorized, you do not own this blog')
+        else:  
+            blog.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
+    def patch(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        request.data['author'] = request.user.id
+        # partial=True argument allows request to omit the content field. (title field is set to required in models/blog.py)
+        updated_blog = BlogSerializer(blog, data=request.data, partial=True)
+        if request.user != blog.author:
+            raise PermissionDenied('Unauthorized, you do not own this blog')
+        else:
+            if updated_blog.is_valid():
+                updated_blog.save()
+                return Response(updated_blog.data)
+            else:
+                return Response(updated_blog.errors, status=status.HTTP_400_BAD_REQUEST)
