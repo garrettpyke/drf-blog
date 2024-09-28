@@ -2,6 +2,7 @@ from django.urls import path
 from .views import generic 
 from .views.users import SignUp, SignIn, SignOut, ChangePassword
 from .views.blogs import BlogsView, BlogView
+from .views.comments import CommentsView, CommentView
 
 urlpatterns = [
     path('', generic.index),
@@ -11,6 +12,15 @@ urlpatterns = [
     path('change-password/', ChangePassword.as_view(), name='change-password'),
     path('blogs/', BlogsView.as_view(), name='blogs'),
     path('blogs/<int:pk>/', BlogView.as_view(), name='blog-detail'),
-    # path('blogs/<int:pk>/comments/', generic.CommentList.as_view(), name='comment-list'),
-    # path('blogs/<int:pk>/comments/<int:comment_id>/', generic.CommentDetail.as_view(), name='comment-detail'),
+    path('comments/',   CommentsView.as_view(), name='comments'),
+    path('blogs/<int:blog_id>/comments/', CommentView.as_view(), name='blog-comments-list'),
+    path('blogs/<int:blog_id>/comments/add',   CommentsView.as_view(), name='comments'),
+    #todo: for comments, the put or patch route that verifies the user is the author
+    # path('blogs/<int:blog_id>/comments/create/', CommentView.as_view(), name='comment-create'),
+    # path('blogs/<int:blog_id>/comments/<int:pk>/update/', CommentView.as_view(), name='comment-update'),
+    # path('blogs/<int:blog_id>/comments/<int:pk>/delete/', CommentView.as_view(), name='comment-delete'),
+    # path('blogs/<int:blog_id>/comments/<int:pk>/', CommentView.as_view(), name='comment-update'),
+    # path('blogs/<int:blog_id>/comments/<int:pk>/delete/', CommentView.as_view(), name='comment-delete'),
+    # path('blogs/<int:blog_id>/comments/<int:pk>/', CommentView.as_view(), name='comment-like'),
+    # path('blogs/<int:blog_id>/comments/<int:pk>/', CommentView.as_view(), name='comment-detail'),
 ]
