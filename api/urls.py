@@ -14,9 +14,8 @@ urlpatterns = [
     path('blogs/<int:pk>/', BlogView.as_view(), name='blog-detail'),
     path('comments/',   CommentsView.as_view(), name='comments'),
     path('blogs/<int:blog_id>/comments/', CommentView.as_view(), name='blog-comments-list'),
-    path('blogs/<int:blog_id>/comments/add',   CommentsView.as_view(), name='comments'),
+    path('blogs/<int:blog_id>/comments/create/',   CommentsView.as_view(), name='comment-create'),
     #todo: for comments, the put or patch route that verifies the user is the author
-    # path('blogs/<int:blog_id>/comments/create/', CommentView.as_view(), name='comment-create'),
     # path('blogs/<int:blog_id>/comments/<int:pk>/update/', CommentView.as_view(), name='comment-update'),
     # path('blogs/<int:blog_id>/comments/<int:pk>/delete/', CommentView.as_view(), name='comment-delete'),
     # path('blogs/<int:blog_id>/comments/<int:pk>/', CommentView.as_view(), name='comment-update'),
