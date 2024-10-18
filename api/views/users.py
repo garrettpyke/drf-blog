@@ -38,6 +38,8 @@ class SignIn(generics.CreateAPIView):
         logger = logging.getLogger(__name__)
         print('Name: ', __name__) #* This shows the name of the logger, which can be used in logging settings - in this case it's 'api.views.users'
         logger.debug('Debug log message!') #* Works
+        logger.setLevel(logging.INFO)
+        logger.info('Info log message')
         
         # Is our user is successfully authenticated...
         if user is not None:  

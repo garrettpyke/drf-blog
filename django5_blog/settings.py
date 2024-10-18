@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import logging.config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -163,7 +162,7 @@ LOGGING = {
             'filename': 'logs/mylog.log',
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
-            'formatter':'verbose',
+            'formatter':'standard',
         },  
         'http': {
             'level':'INFO',
@@ -171,7 +170,7 @@ LOGGING = {
             'formatter':'standard',
         },
         'request_handler': {
-            'level':'DEBUG',
+            'level':'INFO',
             'class':'logging.handlers.RotatingFileHandler',
             'filename': 'logs/django_request.log',
             'maxBytes': 1024*1024*5, # 5 MB
@@ -181,21 +180,22 @@ LOGGING = {
         'console': {
             'level':'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter':'verbose',
+            'formatter':'standard',
         },
     },
     'loggers': {
         # Note that if a logger is unnamed (empty string), it's a global logger. See Django documentation on logging namepaces.
-        'api.views.users': {
-            'handlers': ['default', 'console', 'http'],
+        # This can be narrowed to a single view like 'api.views.users'
+        '': {
+            'handlers': ['default'],
             'level': 'DEBUG',
             'propagate': True
         },
-        # 'django.request': {
-        #     'handlers': ['request_handler', 'console'],
-        #     'level': 'DEBUG',
-        #     'propagate': True
-        # },
+        'django.request': {
+            'handlers': ['request_handler'],
+            'level': 'INFO',
+            'propagate': True
+        },
         'django': {
             'handlers': ['http'],
             'level': 'INFO',

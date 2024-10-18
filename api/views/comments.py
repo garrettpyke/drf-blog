@@ -36,7 +36,8 @@ class CommentView(APIView):
         return Response(data)
     
     # todo: test everything from here down
-    def put(self, request, pk):
+    def put(self, request, blog_id, pk):
+        blog = get_object_or_404(Blog, id=blog_id)
         comment = get_object_or_404(Comment, pk=pk)
         if request.user != comment.author:
             raise PermissionDenied('Unauthorized, you do not own this comment')
