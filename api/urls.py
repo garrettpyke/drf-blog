@@ -15,8 +15,11 @@ urlpatterns = [
     path('comments/',   CommentsView.as_view(), name='comments'),
     path('blogs/<int:blog_id>/comments/', CommentView.as_view(), name='blog-comments-list'),
     path('blogs/<int:blog_id>/comments/create/',   CommentsView.as_view(), name='comment-create'),
-    #todo: for comments, the put or patch route that verifies the user is the author
-    # path('blogs/<int:blog_id>/comments/<int:pk>/update/', CommentView.as_view(), name='comment-update'),
+    # todo: for comments, the put or patch route that verifies the user is the author
+    path('blogs/<int:blog_id>/comments/<int:pk>/update/', CommentView.as_view(), name='comment-update'),
+    #* Note: you can pass the queryset and serializer as an argment in as_view() - see below 
+    #* path('blogs/<int:blog_id>/comments/<int:pk>/update/', CommentView.as_view(queryset=Comment.objects.all(), serializer_class=CommentSerializer), name='comment-update'),
+    
     # path('blogs/<int:blog_id>/comments/<int:pk>/delete/', CommentView.as_view(), name='comment-delete'),
     # path('blogs/<int:blog_id>/comments/<int:pk>/', CommentView.as_view(), name='comment-update'),
     # path('blogs/<int:blog_id>/comments/<int:pk>/delete/', CommentView.as_view(), name='comment-delete'),
