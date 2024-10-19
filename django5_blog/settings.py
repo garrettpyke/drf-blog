@@ -136,7 +136,7 @@ AUTH_USER_MODEL = 'api.MyUser'
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'formatters': {
         'standard': {
             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
@@ -151,18 +151,17 @@ LOGGING = {
             'format': '[FMT2] %(asctime)-15s %(message)s'
         },
         'verbose': {
-            'format': '{levelno}: {levelname} {asctime} {relativeCreated} {module}:{funcName} {processName} {taskName} {threadName} {message}',
-            'style': '{',
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s %(module)s:%(funcName)s %(processName)s %(taskName)s %(threadName)s',
         },
     },
     'handlers': {
-        'default': {
+        'log_file': {
             'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
             'filename': 'logs/mylog.log',
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
-            'formatter':'standard',
+            'formatter':'verbose',
         },  
         'http': {
             'level':'INFO',
@@ -170,34 +169,34 @@ LOGGING = {
             'formatter':'standard',
         },
         'request_handler': {
-            'level':'INFO',
+            'level':'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
             'filename': 'logs/django_request.log',
             'maxBytes': 1024*1024*5, # 5 MB
             'backupCount': 5,
-            'formatter':'standard',
+            'formatter':'verbose',
         },
         'console': {
-            'level':'DEBUG',
+            'level':'INFO',
             'class': 'logging.StreamHandler',
             'formatter':'standard',
         },
     },
     'loggers': {
-        # Note that if a logger is unnamed (empty string), it's a global logger. See Django documentation on logging namepaces.
-        # This can be narrowed to a single view like 'api.views.users'
+        ## Note that if a logger is unnamed (empty string), it's a global logger. See Django documentation on logging namepaces.
+        ## This can be narrowed to a single view like 'api.views.users'
         '': {
-            'handlers': ['default'],
+            'handlers': ['log_file'],
             'level': 'DEBUG',
-            'propagate': True
+            'propagate': False,
         },
-        'django.request': {
-            'handlers': ['request_handler'],
-            'level': 'INFO',
-            'propagate': True
-        },
+        # 'django.request': {
+        #     'handlers': ['request_handler'],
+        #     'level': 'DEBUG',
+        #     'propagate': True
+        # },
         'django': {
-            'handlers': ['http'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
         },
