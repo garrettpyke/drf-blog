@@ -5,7 +5,7 @@ from .views.blogs import BlogsView, BlogView
 from .views.comments import CommentsView, CommentView
 
 urlpatterns = [
-    path('', generic.index),
+    path('', generic.index), #http://127.0.0.1:8000/api/
     path('sign-up/', SignUp.as_view(), name='sign-up'),
     path('sign-in/', SignIn.as_view(), name='sign-in'),
     path('sign-out/', SignOut.as_view(), name='sign-out'),
