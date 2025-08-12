@@ -12,67 +12,62 @@ from rest_framework.exceptions import PermissionDenied
 
 # todo: return related urls & data from views to make fully RESTful
 
-def teapot_success_response(self):
-    content = ['no content.', 'your request was successful, but you should know that I\'m a little teapot and may be short and stout.']
-    return Response(content, status=status.HTTP_200_OK)
+def teapot_no_content_response(self):
+    content = ["204 -> 418 I'm an EMPTY teapot", "Any attempt to brew coffee with a teapot should result in the error code '418 I'm a teapot'. The resulting entity body MAY be short and stout."]
+    return Response(content, status=status.HTTP_204_NO_CONTENT)
 
 class BlogsView(APIView):
     def get(self, request):
-        # blogs = Blog.objects.filter(author=request.user.id) # removed the filter for this route
         blogs = Blog.objects.all()
         user = get_object_or_404(User, pk=request.user.id)
-        blog_data = BlogSerializer(blogs, many=True).data
+        blog_data = BlogSerializer(blogs, many=True).data or 'Wow, such empty.'
         user_data = UserSerializer(user, many=False).data
-        data = [blog_data, user_data] # experimenting with my responses here - re the above todo
+        data = [blog_data, user_data] # experimenting with my responses here regarding the todo on l.13
         return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request):
         request.data['author'] = request.user.id
         blog = BlogSerializer(data=request.data)
-        if blog.is_valid():
-            blog.save()
-            return Response(blog.data, status=status.HTTP_201_CREATED)
-        else:
+        if not blog.is_valid():
             return Response(blog.errors, status=status.HTTP_400_BAD_REQUEST)
+        blog.save()
+        return Response(blog.data, status=status.HTTP_201_CREATED)
 
 class BlogsAuthorView(APIView):
-    def get(self, request, id):
+    def get(self, request, id): # todo: Each post should have another json file containing {[url], [blog detail url]}
         blogs = Blog.objects.filter(author=id)
-        data = BlogSerializer(blogs, many=True).data
-        if data:
+        if data := BlogSerializer(blogs, many=True).data:
             return Response(data, status=status.HTTP_200_OK)
-        return teapot_success_response(self)
+        else:
+            return teapot_no_content_response(self)
 
 class BlogView(APIView):
     def get(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)
         if request.user != blog.author:
             raise PermissionDenied('Unauthorized, you do not own this blog')
-        else:  
-            data = BlogSerializer(blog).data
-            return Response(data)
+        if data := BlogSerializer(blog).data:
+            return Response(data, status=status.HTTP_200_OK)
         # todo: Need to return all comments, but will need a separate serializer to attach to each blog.
 
     def delete(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)
-        if request.user != blog.author:
-            raise PermissionDenied('Unauthorized, you do not own this blog')
-        else:  
+        if request.user == blog.author:
             blog.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response('Blog deleted', status=status.HTTP_204_NO_CONTENT)
+        raise PermissionDenied('Unauthorized, you do not own this blog')
         
     def patch(self, request, pk):
         """
         No PUT method is necessary. This PATCH works for both partial and complete updates.
+        partial=True argument allows request to omit the content field, tho title field is set to required in models/blog.py.
         """
         blog = get_object_or_404(Blog, pk=pk)
         request.data['author'] = request.user.id
-        updated_blog = BlogSerializer(blog, data=request.data, partial=True)  # partial=True argument allows request to omit the content field. (title field is set to required in models/blog.py)
         if request.user != blog.author:
             raise PermissionDenied('Unauthorized, you do not own this blog')
-        else:
-            if updated_blog.is_valid():
-                updated_blog.save()
-                return Response(updated_blog.data)
-            else:
-                return Response(updated_blog.errors, status=status.HTTP_400_BAD_REQUEST)
+        updated_blog = BlogSerializer(blog, data=request.data, partial=True)
+        if not updated_blog.is_valid():
+            return Response(updated_blog.errors, status=status.HTTP_400_BAD_REQUEST)
+        updated_blog.save()
+        return Response(updated_blog.data)
