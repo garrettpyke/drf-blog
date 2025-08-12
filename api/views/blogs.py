@@ -13,17 +13,17 @@ from rest_framework.exceptions import PermissionDenied
 # todo: return related urls & data from views to make fully RESTful
 
 def teapot_success_response(self):
-    content = {'your request was successful, but you should know that I\'m a little teapot and may be short and stout.'}
+    content = ['no content.', 'your request was successful, but you should know that I\'m a little teapot and may be short and stout.']
     return Response(content, status=status.HTTP_200_OK)
 
 class BlogsView(APIView):
     def get(self, request):
-        # blogs = Blog.objects.filter(author=request.user.id) # decided to remove the filter as I want any user to see all blogs
+        # blogs = Blog.objects.filter(author=request.user.id) # removed the filter for this route
         blogs = Blog.objects.all()
         user = get_object_or_404(User, pk=request.user.id)
         blog_data = BlogSerializer(blogs, many=True).data
         user_data = UserSerializer(user, many=False).data
-        data = [blog_data, user_data]
+        data = [blog_data, user_data] # experimenting with my responses here - re the above todo
         return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -34,7 +34,15 @@ class BlogsView(APIView):
             return Response(blog.data, status=status.HTTP_201_CREATED)
         else:
             return Response(blog.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+class BlogsAuthorView(APIView):
+    def get(self, request, id):
+        blogs = Blog.objects.filter(author=id)
+        data = BlogSerializer(blogs, many=True).data
+        if data:
+            return Response(data, status=status.HTTP_200_OK)
+        return teapot_success_response(self)
+
 class BlogView(APIView):
     def get(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)
