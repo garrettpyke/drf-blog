@@ -60,4 +60,4 @@ class CommentView(APIView):
         if not data.is_valid():
             return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
         data.save()
-        return Response(data.data)
+        return Response(data.data, status=status.HTTP_202_ACCEPTED)

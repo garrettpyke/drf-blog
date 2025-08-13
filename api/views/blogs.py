@@ -70,4 +70,4 @@ class BlogView(APIView):
         if not updated_blog.is_valid():
             return Response(updated_blog.errors, status=status.HTTP_400_BAD_REQUEST)
         updated_blog.save()
-        return Response(updated_blog.data)
+        return Response(updated_blog.data, status=status.HTTP_202_ACCEPTED)
