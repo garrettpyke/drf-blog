@@ -1,12 +1,16 @@
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
-from ..serializers.comment import CommentSerializer
 from ..models.comment import Comment
-from ..serializers.blog import BlogSerializer
+from ..serializers.comment import CommentSerializer
 from ..models.blog import Blog
+
+def political_no_content_response(self):
+    content = {"Message 1": 'As politicians say, no comment!', "Message 2": ""}
+    return Response(content, status=status.HTTP_204_NO_CONTENT)
 
 class CommentsView(APIView):
     def get(self, request, *args, **kwargs):
@@ -31,19 +35,29 @@ class CommentView(APIView):
     def get(self, request, blog_id):
         blog = get_object_or_404(Blog, id=blog_id)
         comments = Comment.objects.filter(blog=blog)
-        data = CommentSerializer(comments, many=True).data
-        return Response(data)
+        if data := CommentSerializer(comments, many=True).data:
+            return Response(data)
+        return political_no_content_response(self)
     
-    # todo: test everything from here down
-    def put(self, request, blog_id, pk):
-        blog = get_object_or_404(Blog, id=blog_id)
+    def delete(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)
         if request.user != comment.author:
             raise PermissionDenied('Unauthorized, you do not own this comment')
-        else:  
-            data = CommentSerializer(comment, data=request.data, partial=True)
-            if data.is_valid():
-                data.save()
-                return Response(data.data)
-            else:
-                return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
+        comment.delete()
+        return Response('Comment deleted', status=status.HTTP_204_NO_CONTENT)
+    
+    def put(self, request, pk):
+        try:
+            comment = Comment.objects.get(id=pk)
+            print(comment)
+        except ObjectDoesNotExist:
+            return Response({"error": "Comment doesn't exist for you"}, status=status.HTTP_404_NOT_FOUND)
+        if request.user != comment.author:
+            raise PermissionDenied('Unauthorized, you do not own this comment')
+        request.data['blog'] = comment.blog.id
+        request.data['author'] = request.user.id
+        data = CommentSerializer(comment, data=request.data, partial=False)
+        if not data.is_valid():
+            return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
+        data.save()
+        return Response(data.data)

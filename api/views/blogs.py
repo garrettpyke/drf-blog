@@ -1,19 +1,19 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from ..serializers.blog import BlogSerializer
 from ..models.blog import Blog
 from ..serializers.comment import CommentSerializer
 from ..models.comment import Comment
 from ..serializers.user import UserSerializer
 from ..models.user import MyUser as User
-from rest_framework import status
-from django.shortcuts import get_object_or_404
-from rest_framework.exceptions import PermissionDenied
 
 # todo: return related urls & data from views to make fully RESTful
 
 def teapot_no_content_response(self):
-    content = ["204 -> 418 I'm an EMPTY teapot", "Any attempt to brew coffee with a teapot should result in the error code '418 I'm a teapot'. The resulting entity body MAY be short and stout."]
+    content = {"204 -> 418 I'm an EMPTY teapot": "Any attempt to brew coffee with a teapot should result in the error code '418 I'm a teapot'. The resulting entity body MAY be short and stout."}
     return Response(content, status=status.HTTP_204_NO_CONTENT)
 
 class BlogsView(APIView):
