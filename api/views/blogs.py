@@ -44,11 +44,13 @@ class BlogsAuthorView(APIView):
 class BlogView(APIView):
     def get(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)
-        if request.user != blog.author:
-            raise PermissionDenied('Unauthorized, you do not own this blog')
-        if data := BlogSerializer(blog).data:
+        if blog_data := BlogSerializer(blog).data:
+            comments = Comment.objects.filter(blog_id=blog.id)
+            comment_data = CommentSerializer(comments, many=True).data or 'No comments yet'
+            # comment_dict = {"comments": comment_data}
+            data = [blog_data, comment_data]
             return Response(data, status=status.HTTP_200_OK)
-        # todo: Need to return all comments, but will need a separate serializer to attach to each blog.
+        return Response('No blog found', status=status.HTTP_404_NOT_FOUND)
 
     def delete(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)

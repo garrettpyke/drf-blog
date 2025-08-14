@@ -49,7 +49,6 @@ class CommentView(APIView):
     def put(self, request, pk):
         try:
             comment = Comment.objects.get(id=pk)
-            print(comment)
         except ObjectDoesNotExist:
             return Response({"error": "Comment doesn't exist for you"}, status=status.HTTP_404_NOT_FOUND)
         if request.user != comment.author:
