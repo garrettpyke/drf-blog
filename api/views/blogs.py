@@ -10,11 +10,13 @@ from ..models.comment import Comment
 from ..serializers.user import UserSerializer
 from ..models.user import MyUser as User
 
-# todo: return related urls & data from views to make fully RESTful
-
 def teapot_no_content_response(self):
     content = {"204 -> 418 I'm an EMPTY teapot": "Any attempt to brew coffee with a teapot should result in the error code '418 I'm a teapot'. The resulting entity body MAY be short and stout."}
     return Response(content, status=status.HTTP_204_NO_CONTENT)
+
+def get_blog_detail_uri(blog_id):
+    base_uri = 'http://localhost:8000/api/blog/'
+    return f"{base_uri}{blog_id}/"
 
 class BlogsView(APIView):
     def get(self, request):
@@ -34,19 +36,20 @@ class BlogsView(APIView):
         return Response(blog.data, status=status.HTTP_201_CREATED)
 
 class BlogsAuthorView(APIView):
-    def get(self, request, id): # todo: Each post should have another json file containing {[url], [blog detail url]}
+    def get(self, request, id):
         blogs = Blog.objects.filter(author=id)
         if data := BlogSerializer(blogs, many=True).data:
+            for blog in data:
+                blog["uri"] = get_blog_detail_uri(blog["id"])
             return Response(data, status=status.HTTP_200_OK)
-        else:
-            return teapot_no_content_response(self)
+        return teapot_no_content_response(self)
 
 class BlogView(APIView):
     def get(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)
         if blog_data := BlogSerializer(blog).data:
             comments = Comment.objects.filter(blog_id=blog.id)
-            comment_data = CommentSerializer(comments, many=True).data or 'No comments yet'
+            comment_data = CommentSerializer(comments, many=True).data or []
             # comment_dict = {"comments": comment_data}
             data = [blog_data, comment_data]
             return Response(data, status=status.HTTP_200_OK)
