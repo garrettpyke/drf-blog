@@ -1,30 +1,34 @@
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
-from ..serializers.blog import BlogSerializer
 from ..models.blog import Blog
-from ..serializers.comment import CommentSerializer
+from ..serializers.blog import BlogSerializer
 from ..models.comment import Comment
-from ..serializers.user import UserSerializer
+from ..serializers.comment import CommentSerializer
 from ..models.user import MyUser as User
+from ..serializers.user import UserSerializer
 
 def teapot_no_content_response(self):
     content = {"204 -> 418 I'm an EMPTY teapot": "Any attempt to brew coffee with a teapot should result in the error code '418 I'm a teapot'. The resulting entity body MAY be short and stout."}
     return Response(content, status=status.HTTP_204_NO_CONTENT)
 
 def get_blog_detail_uri(blog_id):
-    base_uri = 'http://localhost:8000/api/blog/'
-    return f"{base_uri}{blog_id}/"
+    return f"{settings.BASE_URI}{blog_id}/"
 
 class BlogsView(APIView):
     def get(self, request):
         blogs = Blog.objects.all()
         user = get_object_or_404(User, pk=request.user.id)
-        blog_data = BlogSerializer(blogs, many=True).data or 'Wow, such empty.'
+        if blog_data := BlogSerializer(blogs, many=True).data:
+            for blog in blog_data:
+                blog["uri"] = get_blog_detail_uri(blog["id"])
+        else: 
+            blog_data = 'Wow, such empty.'
         user_data = UserSerializer(user, many=False).data
-        data = [blog_data, user_data] # experimenting with my responses here regarding the todo on l.13
+        data = [blog_data, user_data]
         return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request):
