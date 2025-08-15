@@ -1,3 +1,7 @@
+# settings.py
+
 # Logs
 *.log
 
+# IDEs
+.DS_Store
