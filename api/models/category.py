@@ -13,4 +13,3 @@ class Category(models.Model):
     
     def __str__(self):
         return f"{__class__}(subject='{self.subject}', genre='{self.genre}', created_at='{self.created_at}'"
-        

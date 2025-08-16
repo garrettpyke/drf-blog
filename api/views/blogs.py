@@ -48,6 +48,15 @@ class BlogsAuthorView(APIView):
             return Response(data, status=status.HTTP_200_OK)
         return teapot_no_content_response(self)
 
+class BlogsCategoryView(APIView):
+    def get(self, request, pk):
+        blogs = Blog.objects.filter(category=pk)
+        if data := BlogSerializer(blogs, many=True).data:
+            for blog in data:
+                blog["uri"] = get_blog_detail_uri(blog["id"])
+            return Response(data, status=status.HTTP_200_OK)
+        return Response({"404": "Category does not exist yet"}, status=status.HTTP_404_NOT_FOUND)
+
 class BlogView(APIView):
     def get(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)
@@ -65,7 +74,7 @@ class BlogView(APIView):
             blog.delete()
             return Response('Blog deleted', status=status.HTTP_204_NO_CONTENT)
         raise PermissionDenied('Unauthorized, you do not own this blog')
-        
+
     def patch(self, request, pk):
         """
         No PUT method is necessary. This PATCH works for both partial and complete updates.

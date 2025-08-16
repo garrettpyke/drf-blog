@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import generic 
 from .views.users import SignUp, SignIn, SignOut, ChangePassword
-from .views.blogs import BlogsView, BlogsAuthorView, BlogView
+from .views.blogs import BlogsView, BlogsAuthorView, BlogsCategoryView, BlogView
 from .views.comments import CommentsView, CommentView
 
 urlpatterns = [
@@ -11,7 +11,8 @@ urlpatterns = [
     path('sign-out/', SignOut.as_view(), name='sign-out'),
     path('change-password/', ChangePassword.as_view(), name='change-password'),
     path('blogs/', BlogsView.as_view(), name='blogs'),
-    path('blogs/<int:id>/', BlogsAuthorView.as_view(), name='blogs-author'),
+    path('blogs/author/<int:id>/', BlogsAuthorView.as_view(), name='blogs-author'),
+    path('blogs/category/<int:pk>/', BlogsCategoryView.as_view(), name='blogs-category'),
     path('blog/<int:pk>/', BlogView.as_view(), name='blog-detail'),
     path('comments/',   CommentsView.as_view(), name='comments'),
     path('blog/<int:blog_id>/comments/', CommentView.as_view(), name='blog-comments-list'),
