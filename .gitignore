@@ -1,4 +1,6 @@
-# settings.py
+# Settings
+# settings.py # Committing settings for this dev version
+!settingsrc # Created this to easily configure settings from within virtual environment
 
 # Logs
 *.log

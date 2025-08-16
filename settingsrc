@@ -1,0 +1,5 @@
+export PYTHONPATH=":/Users/gary/Projects/Python/Django-CRUD2/django5_blog"
+# or `export PYTHONPATH=$PWD` from within project folder, in this case django5_blog
+# See https://stackoverflow.com/questions/8826534/how-can-i-correctly-set-django-settings-module-for-my-django-project-i-am-using
+
+export DJANGO_SETTINGS_MODULE="django5_blog.settings"
