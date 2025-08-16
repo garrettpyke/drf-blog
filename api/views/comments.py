@@ -17,7 +17,7 @@ class CommentsView(APIView):
         comments = Comment.objects.filter(author=request.user)
         if data := CommentSerializer(comments, many=True).data:
             return Response(data, status=status.HTTP_200_OK)
-        return Response('As politicians say, no comment!', status=status.HTTP_204_NO_CONTENT)
+        return political_no_content_response(self)
     
     def post(self, request, blog_id):
         request.data['author'] = request.user.id

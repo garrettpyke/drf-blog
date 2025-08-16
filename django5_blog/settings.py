@@ -119,7 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# For Time Zone: https://docs.djangoproject.com/en/5.2/ref/settings/#std-setting-TIME_ZONE
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Denver'
+# TIME_ZONE = 'MST' # Also works, but MDT doesn't
 
 USE_I18N = True
 
