@@ -3,6 +3,7 @@ from .views import generic
 from .views.users import SignUp, SignIn, SignOut, ChangePassword
 from .views.blogs import BlogsView, BlogsAuthorView, BlogsCategoryView, BlogView
 from .views.comments import CommentsView, CommentView
+from .views.votes import BlogVotesView
 
 urlpatterns = [
     path('', generic.index), #http://127.0.0.1:8000/api/
@@ -13,11 +14,12 @@ urlpatterns = [
     path('blogs/', BlogsView.as_view(), name='blogs'),
     path('blogs/author/<int:id>/', BlogsAuthorView.as_view(), name='blogs-author'),
     path('blogs/category/<int:pk>/', BlogsCategoryView.as_view(), name='blogs-category'),
-    path('blog/<int:pk>/', BlogView.as_view(), name='blog-detail'),
+    path('blog/<int:pk>/', BlogView.as_view(), name='blog-detail'), # todo: include votes!
     path('comments/',   CommentsView.as_view(), name='comments'),
     path('blog/<int:blog_id>/comments/', CommentView.as_view(), name='blog-comments-list'),
     path('blog/<int:blog_id>/comment/create/',   CommentsView.as_view(), name='comment-create'),
     path('blog/comment/<int:pk>/', CommentView.as_view(), name='comment-detail'),
+    path('blog/<int:pk>/vote/like/', BlogVotesView.as_view(), name="blog-vote"), 
     #* Note: you can pass the queryset and serializer as an argment in as_view() - see below 
     #* path('blogs/<int:blog_id>/comments/<int:pk>/update/', CommentView.as_view(queryset=Comment.objects.all(), serializer_class=CommentSerializer), name='comment-update'),
     # path('blogs/<int:blog_id>/comments/<int:pk>/', CommentView.as_view(), name='comment-like'),
