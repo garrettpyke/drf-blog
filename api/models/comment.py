@@ -16,5 +16,5 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)    
     
     def __str__(self):
-        # return f"{__class__}"
-        return f"{__class__}(content='{self.content[:50]}', author='{self.author}', updated='{self.updated_at}'"
+        # return f"{__content__}"
+        return f"{__class__}(content='{self.content[:50]}', blog='{self.blog}', author='{self.author}', updated='{self.updated_at}'"

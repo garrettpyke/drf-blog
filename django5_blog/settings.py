@@ -122,7 +122,7 @@ LANGUAGE_CODE = 'en-us'
 # For Time Zone: https://docs.djangoproject.com/en/5.2/ref/settings/#std-setting-TIME_ZONE
 # TIME_ZONE = 'UTC'
 TIME_ZONE = 'America/Denver'
-# TIME_ZONE = 'MST' # Also works, but MDT doesn't
+# TIME_ZONE = 'MST' # Also works, but MDT doesn't. Neither does 'UTC-07:00'
 
 USE_I18N = True
 
