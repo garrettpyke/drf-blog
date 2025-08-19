@@ -26,5 +26,5 @@ class Vote(models.Model):
     voted_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        # return f"{__class__}(id='{self.id}')"
+        # return f"{__class__}(id='{self.id}'), 'vote_type='{self.vote_type}')"
         return f"{__class__}(id='{self.id}', 'vote_type='{self.vote_type}', blog='{self.blog}', voter='{self.voter}', voted_at='{self.voted_at}'"
