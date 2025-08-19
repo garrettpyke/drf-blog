@@ -39,3 +39,18 @@ class BlogVotesView(APIView):
             return vote_not_accepted_response(self, content={"vote not accepted": "bad request"})
         vote.save()
         return Response(vote.data, status=status.HTTP_201_CREATED)
+    
+    def delete(self, request, pk):
+        # blog = get_object_or_404(Blog, pk=pk)
+        # blog = get_object_or_404(Blog.objects.filter(pk=pk)) # Blog | None
+        blog = Blog.objects.filter(pk=pk).first() # Blog | None
+        print(blog)
+        if blog:
+            votes = blog.vote_set.all() # todo: Works! Filter this by request.user.id
+            print(votes) 
+            return Response({"blog found": ""}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+        return Response({"blog not found": ""}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
+        # vote = get_object_or_404(Vote.objects.filter(blog=blog, voter=request.user.id))
+        # print(vote)
+        # todo - verify vote belongs to user!
+        
