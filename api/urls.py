@@ -19,7 +19,7 @@ urlpatterns = [
     path('blog/<int:blog_id>/comments/', CommentView.as_view(), name='blog-comments-list'),
     path('blog/<int:blog_id>/comment/create/',   CommentsView.as_view(), name='comment-create'),
     path('blog/comment/<int:pk>/', CommentView.as_view(), name='comment-detail'),
-    path('blog/<int:pk>/vote/', BlogVotesView.as_view(), name="blog-vote"), 
+    path('blog/<int:pk>/vote/', BlogVotesView.as_view(), name="blog-vote"),
     # todo: Note: you can pass the queryset and serializer as an argment in as_view() - try it for all blogs view
     #* path('blogs/<int:blog_id>/comments/<int:pk>/update/', CommentView.as_view(queryset=Comment.objects.all(), serializer_class=CommentSerializer), name='comment-update'),
     # path('blogs/<int:blog_id>/comments/<int:pk>/', CommentView.as_view(), name='comment-like'),

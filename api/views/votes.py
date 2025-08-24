@@ -20,17 +20,15 @@ class BlogVotesView(APIView):
         # vote_type_sum = Vote.objects.filter(blog=blog, voter_id=self.request.user.id).aggregate(Sum("vote_type")) # {'vote_type__sum': 3}
         # vote_count = Vote.objects.filter(blog=blog, voter_id=self.request.user.id).aggregate(Count("vote_type")) # {'vote_type__count': 2}
         if Vote.objects.filter(blog=blog, voter=self.request.user.id).exists():
-            return Vote.objects.filter(blog=blog, voter=self.request.user.id).values("vote_type", "voted_at").latest("voted_at")
-        return 0
+            return Vote.objects.filter(blog=blog, voter=self.request.user.id).get()
+        return None
     
     def post(self, request, pk):
         """
-        Allows each user to add or modify 1 vote per Blog
+        Allows each user to add 1 vote per Blog
         """ 
         blog = get_object_or_404(Blog, pk=pk)
-        existing_vote = self.get_existing_vote(self, blog)
-        print(existing_vote)
-        if existing_vote['vote_type'] == request.data['vote_type']:
+        if existing_vote := self.get_existing_vote(self, blog):
             return vote_not_accepted_response(self)
         request.data['voter'] = request.user.id
         request.data['blog'] = blog.id
@@ -41,16 +39,17 @@ class BlogVotesView(APIView):
         return Response(vote.data, status=status.HTTP_201_CREATED)
     
     def delete(self, request, pk):
-        # blog = get_object_or_404(Blog, pk=pk)
-        # blog = get_object_or_404(Blog.objects.filter(pk=pk)) # Blog | None
-        blog = Blog.objects.filter(pk=pk).first() # Blog | None
-        print(blog)
-        if blog:
-            votes = blog.vote_set.all() # todo: Works! Filter this by request.user.id
-            print(votes) 
-            return Response({"blog found": ""}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
-        return Response({"blog not found": ""}, status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
-        # vote = get_object_or_404(Vote.objects.filter(blog=blog, voter=request.user.id))
-        # print(vote)
-        # todo - verify vote belongs to user!
-        
+        if blog := Blog.objects.filter(pk=pk).first(): # Blog | None
+            if vote := self.get_existing_vote(self, blog):
+                vote.delete()
+                return Response({"vote deleted": ""}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"vote not found": ""}, status=status.HTTP_404_NOT_FOUND) 
+        return Response({"blog not found": ""}, status=status.HTTP_404_NOT_FOUND)
+
+    def patch(self, request, pk):
+        if blog := Blog.objects.filter(pk=pk).first(): # Blog | None
+            if request.data['vote_type'] in Vote.VOTE_TYPE_CHOICES:
+                Vote.objects.filter(blog=blog, voter=self.request.user.id).update(vote_type=request.data['vote_type'])
+                return Response({"vote updated": ""}, status=status.HTTP_202_ACCEPTED) 
+            return Response({"invalid vote": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"blog not found": ""}, status=status.HTTP_404_NOT_FOUND)
