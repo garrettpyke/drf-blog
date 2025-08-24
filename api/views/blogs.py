@@ -8,6 +8,8 @@ from ..models.blog import Blog
 from ..serializers.blog import BlogSerializer
 from ..models.comment import Comment
 from ..serializers.comment import CommentSerializer
+from ..models.category import Category
+from ..serializers.category import CategorySerializer
 from ..models.user import MyUser as User
 from ..serializers.user import UserSerializer
 
@@ -50,12 +52,17 @@ class BlogsAuthorView(APIView):
 
 class BlogsCategoryView(APIView):
     def get(self, request, pk):
-        blogs = Blog.objects.filter(category=pk)
-        if data := BlogSerializer(blogs, many=True).data:
-            for blog in data:
-                blog["uri"] = get_blog_detail_uri(blog["id"])
+        if category := Category.objects.filter(pk=pk).first():
+            category_data = CategorySerializer(category, many=False).data
+            blogs = Blog.objects.filter(category=pk)
+            if blog_data := BlogSerializer(blogs, many=True).data:
+                for blog in blog_data:
+                    blog["uri"] = get_blog_detail_uri(blog["id"])
+            else:
+                blog_data = "No blogs exist for this category"
+            data = {f"{category_data['subject']} - {category_data['genre']}": blog_data}
             return Response(data, status=status.HTTP_200_OK)
-        return Response({"404": "Category does not exist yet"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"404": "Category does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
 class BlogView(APIView):
     def get(self, request, pk):
