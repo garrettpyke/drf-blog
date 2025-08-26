@@ -1,15 +1,15 @@
 from django.shortcuts import get_object_or_404
-from django.db.models import Count, Sum
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from ..models.blog import Blog
-# from ..serializers.blog import BlogSerializer
+from ..serializers.blog import BlogSerializer
 from ..models.user import MyUser as User
 # from ..serializers.user import UserSerializer
 from ..models.vote import Vote
 from ..serializers.vote import VoteSerializer
+from ..serializers.blog_vote import BlogVoteSerializer
 
 def vote_not_accepted_response(self, content=None):
     content = {"vote not accepted": 'vote already exists'} if content is None else content
@@ -23,18 +23,27 @@ class BlogVotesView(APIView):
             return Vote.objects.filter(blog=blog, voter=self.request.user.id).get()
         return None
     
+    # def get(self, request, pk):
+    #     blog = get_object_or_404(Blog, pk=pk)
+    #     votes = self.get_existing_vote(self, blog) or []
+    #     blog_data = BlogSerializer(blog).data
+    #     # blog_votes = BlogVoteSerializer([blog, votes], many=True).data
+    #     print(blog_data)
+    #     return Response(blog_data, status=status.HTTP_200_OK)
+    
     def post(self, request, pk):
         """
         Allows each user to add 1 vote per Blog
         """ 
         blog = get_object_or_404(Blog, pk=pk)
-        if existing_vote := self.get_existing_vote(self, blog):
+        if self.get_existing_vote(self, blog):
             return vote_not_accepted_response(self)
         request.data['voter'] = request.user.id
         request.data['blog'] = blog.id
         vote = VoteSerializer(data=request.data)
         if not vote.is_valid():
-            return vote_not_accepted_response(self, content={"vote not accepted": "bad request"})
+            message = {"vote not accepted": vote.errors}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
         vote.save()
         return Response(vote.data, status=status.HTTP_201_CREATED)
     
