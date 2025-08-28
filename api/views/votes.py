@@ -4,15 +4,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from ..models.blog import Blog
-from ..serializers.blog import BlogSerializer
-from ..models.user import MyUser as User
-# from ..serializers.user import UserSerializer
+from ..serializers.blog_vote import BlogVoteSerializer
+from ..models.comment import Comment
+from ..serializers.comment import CommentSerializer
 from ..models.vote import Vote
 from ..serializers.vote import VoteSerializer
-from ..serializers.blog_vote import BlogVoteSerializer
 
 def vote_not_accepted_response(self, content=None):
-    content = {"vote not accepted": 'vote already exists'} if content is None else content
+    content = {"vote not accepted": 'you have an existing vote (limit 1 per customer)'} if content is None else content
     return Response(content, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 class BlogVotesView(APIView):
@@ -23,13 +22,14 @@ class BlogVotesView(APIView):
             return Vote.objects.filter(blog=blog, voter=self.request.user.id).get()
         return None
     
-    # def get(self, request, pk):
-    #     blog = get_object_or_404(Blog, pk=pk)
-    #     votes = self.get_existing_vote(self, blog) or []
-    #     blog_data = BlogSerializer(blog).data
-    #     # blog_votes = BlogVoteSerializer([blog, votes], many=True).data
-    #     print(blog_data)
-    #     return Response(blog_data, status=status.HTTP_200_OK)
+    def get(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        blog_votes = BlogVoteSerializer(blog).data
+        comments = Comment.objects.filter(blog_id=blog.id).all()
+        blog_comments = CommentSerializer(comments, many=True).data or []
+        # data = [blog_votes, blog_comments]
+        data = [blog_votes, {'comments': blog_comments}]
+        return Response(data, status=status.HTTP_200_OK)
     
     def post(self, request, pk):
         """

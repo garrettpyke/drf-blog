@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.db.models import Sum
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,6 +11,7 @@ from ..models.comment import Comment
 from ..serializers.comment import CommentSerializer
 from ..models.category import Category
 from ..serializers.category import CategorySerializer
+from ..models.vote import Vote
 from ..models.user import MyUser as User
 from ..serializers.user import UserSerializer
 
@@ -20,6 +22,22 @@ def teapot_no_content_response(self):
 def get_blog_detail_uri(blog_id):
     return f"{settings.BASE_URI}{blog_id}/"
 
+def get_total_vote(blog_id):
+    """
+    LOVE = 2
+    LIKE = 1
+    NO_VOTE = 0
+    DOWN_VOTE = -1
+    VOTE_TYPE_CHOICES = {
+        LOVE: "Love",
+        LIKE: "Like",
+        NO_VOTE: "",
+        DOWN_VOTE: "Down"
+    }
+    """
+    # vote_count = Vote.objects.filter(blog=blog, voter_id=self.request.user.id).aggregate(Count("vote_type")) # {'vote_type__count': 2}
+    return Vote.objects.filter(blog=blog_id).aggregate(Sum("vote_type")) or 0 # {'vote_type__sum': 3}
+
 class BlogsView(APIView):
     def get(self, request):
         blogs = Blog.objects.all()
@@ -27,6 +45,7 @@ class BlogsView(APIView):
         if blog_data := BlogSerializer(blogs, many=True).data:
             for blog in blog_data:
                 blog["uri"] = get_blog_detail_uri(blog["id"])
+                blog["votes"] = get_total_vote(blog["id"])["vote_type__sum"]
         else: 
             blog_data = 'Wow, such empty.'
         user_data = UserSerializer(user, many=False).data
@@ -55,7 +74,7 @@ class BlogsCategoryView(APIView):
         if category := Category.objects.filter(pk=pk).first():
             category_data = CategorySerializer(category, many=False).data
             blogs = Blog.objects.filter(category=pk)
-            if blog_data := BlogSerializer(blogs, many=True).data:
+            if blog_data := BlogSerializer(blogs, many=True):
                 for blog in blog_data:
                     blog["uri"] = get_blog_detail_uri(blog["id"])
             else:

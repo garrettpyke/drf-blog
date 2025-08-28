@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 
 """
 title : string
-content : string
+content : text
+category: Category reference
 author : user reference
 updated_at/created_at
 """
@@ -17,4 +18,4 @@ class Blog(models.Model):
     
     def __str__(self):
         # return self.title
-        return f"{__class__}(title='{self.title}', author='{self.author}', updated='{self.updated_at}'"
+        return f"{__class__}(title='{self.title}', content='{self.content}', category='{self.category}', author='{self.author}', updated='{self.updated_at}'"

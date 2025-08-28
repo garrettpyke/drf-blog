@@ -21,7 +21,7 @@ class Vote(models.Model):
         DOWN_VOTE: "Down"
     }
     vote_type = models.SmallIntegerField(default=VOTE_TYPE_CHOICES[NO_VOTE], choices=VOTE_TYPE_CHOICES)
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    blog = models.ForeignKey(Blog, related_name='votes', on_delete=models.CASCADE)
     voter = models.ForeignKey(get_user_model(), on_delete=models.PROTECT) # let's save votes when user deleted
     voted_at = models.DateTimeField(auto_now=True)
     
