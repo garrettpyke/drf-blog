@@ -86,7 +86,7 @@ class BlogsCategoryView(APIView):
 class BlogView(APIView):
     def get(self, request, pk):
         blog = get_object_or_404(Blog, pk=pk)
-        if blog_data := BlogSerializer(blog).data:
+        if blog_data := BlogSerializer(blog, context={'<uri>': 'BlogSerializer.context property test'}).data:
             comments = Comment.objects.filter(blog_id=blog.id)
             comment_data = CommentSerializer(comments, many=True).data or []
             # comment_dict = {"comments": comment_data}
