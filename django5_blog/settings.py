@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'api',
 ]
 
@@ -46,19 +47,28 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication'
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
-    ]
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
 }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:4200',
+    # "http://127.0.0.1:4200",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:4200',
+    # "http://127.0.0.1:4200",
 ]
 
 ROOT_URLCONF = 'django5_blog.urls'
@@ -86,13 +96,13 @@ WSGI_APPLICATION = 'django5_blog.wsgi.application'
 
 DATABASES = {
     'default': {
-	'ENGINE': 'django.db.backends.mysql',
-	'NAME': 'blog2',
-	'USER': 'root',
-	'PASSWORD': 'qs-mysql',
-	'HOST':'127.0.0.1',  #* Don't use localhost unless you want to connect locally
-	'PORT':'3306',
-	}
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'blog2',
+        'USER': 'root',
+        'PASSWORD': 'qs-mysql',
+        'HOST': '127.0.0.1',  # * Don't use localhost unless you want to connect locally
+        'PORT': '3306',
+    }
 }
 
 # Password validation
@@ -137,54 +147,46 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'api.MyUser' 
+AUTH_USER_MODEL = 'api.MyUser'
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters': {
-        'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-        },
-        'basic': {
-            'format': '%(asctime)s %(message)s'
-            },
-        'fmt1': {
-            'format': '[FMT1] %(asctime)-15s %(message)s'
-        },
-        'fmt2': {
-            'format': '[FMT2] %(asctime)-15s %(message)s'
-        },
+        'standard': {'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'},
+        'basic': {'format': '%(asctime)s %(message)s'},
+        'fmt1': {'format': '[FMT1] %(asctime)-15s %(message)s'},
+        'fmt2': {'format': '[FMT2] %(asctime)-15s %(message)s'},
         'verbose': {
             'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s %(module)s:%(funcName)s %(processName)s %(taskName)s %(threadName)s',
         },
     },
     'handlers': {
         'log_file': {
-            'level':'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'logs/mylog.log',
-            'maxBytes': 1024*1024*5, # 5 MB
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
-            'formatter':'verbose',
-        },  
+            'formatter': 'verbose',
+        },
         'http': {
-            'level':'INFO',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter':'standard',
+            'formatter': 'standard',
         },
         'request_handler': {
-            'level':'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': 'logs/django_request.log',
-            'maxBytes': 1024*1024*5, # 5 MB
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
-            'formatter':'verbose',
+            'formatter': 'verbose',
         },
         'console': {
-            'level':'INFO',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter':'standard',
+            'formatter': 'standard',
         },
     },
     'loggers': {
@@ -205,5 +207,5 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-    }
+    },
 }
