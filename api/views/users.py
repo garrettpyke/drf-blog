@@ -3,8 +3,9 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated # todo: don't need here for Token auth, but will need elsewhere
-import logging
+from ..models.user import MyUser as User
 from ..serializers.user import UserSerializer
+import logging
 
 class SignUp(generics.CreateAPIView):
     # Override the authentication/permissions classes so this endpoint
@@ -84,3 +85,17 @@ class ChangePassword(generics.UpdateAPIView):
         user.set_password(new_pw)
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserDetail(generics.RetrieveAPIView):
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response({ 'user': serializer.data })
+
+class UsersList(generics.ListAPIView):
+    def get(self, request):
+        users = User.objects.all()
+        # is_admin = request.user.is_admin
+        serializer = UserSerializer(users, many=True)
+        # return Response({ 'users': serializer.data, 'is_admin': is_admin })
+        return Response({ 'users': serializer.data })
