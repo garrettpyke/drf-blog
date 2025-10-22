@@ -16,5 +16,7 @@
         "titleBar.inactiveBackground": "#47ce8b99",
         "titleBar.inactiveForeground": "#15202b99"
     },
-    "peacock.color": "#47ce8b"
+    "peacock.color": "#47ce8b",
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "python-envs.pythonProjects": []
 }

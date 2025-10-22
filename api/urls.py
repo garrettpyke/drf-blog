@@ -4,6 +4,7 @@ from .views.users import SignUp, SignIn, SignOut, ChangePassword, UsersList
 from .views.blogs import BlogsView, BlogsAuthorView, BlogsCategoryView, BlogView
 from .views.comments import CommentsView, CommentView
 from .views.votes import BlogVotesView
+from .views.category import CategoryView
 
 urlpatterns = [
     path('', generic.index), #http://127.0.0.1:8000/api/
@@ -21,6 +22,7 @@ urlpatterns = [
     path('blog/comment/<int:pk>/', CommentView.as_view(), name='comment-detail'),
     path('blog/<int:pk>/vote/', BlogVotesView.as_view(), name="blog-vote"),
     path('users/', UsersList.as_view(), name='users-list'),
+    path('categories/', CategoryView.as_view(), name='category-list'),
     #* Note: you can pass the queryset and serializer as an argment in as_view() as shown below
     #* path('blogs/<int:blog_id>/comments/<int:pk>/update/', CommentView.as_view(queryset=Comment.objects.all(), serializer_class=CommentSerializer), name='comment-update'),
 ]
